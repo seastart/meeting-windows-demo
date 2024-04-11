@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+***************************************************************************************************
+ Copyright (C) 2023 The Qt Company Ltd.
+ SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+***************************************************************************************************
+-->
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="CJsonObject\JsonUtil.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DataModel\MemberDataModel.h" />
+    <ClInclude Include="DataModel\RoomDataModel.h" />
+    <QtMoc Include="NetWork\WebApiClass.h" />
+    <ClInclude Include="RtcSdk\VideoDevice.h" />
+    <ClInclude Include="Tools\FlowLayout.h" />
+    <ClInclude Include="Tools\log4qt\basicconfigurator.h" />
+    <ClInclude Include="Tools\log4qt\helpers\classlogger.h" />
+    <ClInclude Include="Tools\log4qt\helpers\datetime.h" />
+    <ClInclude Include="Tools\log4qt\helpers\factory.h" />
+    <ClInclude Include="Tools\log4qt\helpers\initialisationhelper.h" />
+    <ClInclude Include="Tools\log4qt\helpers\logerror.h" />
+    <ClInclude Include="Tools\log4qt\helpers\logobjectptr.h" />
+    <ClInclude Include="Tools\log4qt\helpers\optionconverter.h" />
+    <ClInclude Include="Tools\log4qt\helpers\patternformatter.h" />
+    <ClInclude Include="Tools\log4qt\helpers\properties.h" />
+    <QtMoc Include="View\Room\WidDeviceList.h" />
+    <QtMoc Include="View\Common\WidgetClick.h" />
+    <QtMoc Include="View\Home\WidUserInfo.h" />
+    <QtMoc Include="View\Common\TanChuWid.h" />
+    <QtMoc Include="View\Login\WidRegister.h" />
+    <QtMoc Include="View\Room\WidSetData.h" />
+    <QtMoc Include="View\Room\WidRoom.h" />
+    <QtMoc Include="View\Room\WidDiaplayView.h" />
+    <QtMoc Include="View\Login\WidLogin.h" />
+    <QtMoc Include="View\Home\WidHome.h" />
+    <QtMoc Include="View\Common\WidDialog.h" />
+    <QtMoc Include="View\Common\WidBtn.h" />
+    <QtMoc Include="View\Common\RoundLoadingWidget.h" />
+    <QtMoc Include="View\Common\MicIconView.h" />
+    <QtMoc Include="View\Common\ImageTipsWidgetWidget.h" />
+    <QtMoc Include="View\Common\IChatBase.h" />
+    <QtMoc Include="View\Common\ChatYouWidget.h" />
+    <QtMoc Include="View\Common\ChatWidget.h" />
+    <QtMoc Include="View\Common\ChatMyWidget.h" />
+    <QtMoc Include="View\Common\ChatControl.h" />
+    <QtMoc Include="widget.h" />
+    <QtMoc Include="Tools\log4qt\varia\stringmatchfilter.h" />
+    <QtMoc Include="Tools\log4qt\varia\nullappender.h" />
+    <QtMoc Include="Tools\log4qt\varia\listappender.h" />
+    <QtMoc Include="Tools\log4qt\varia\levelrangefilter.h" />
+    <QtMoc Include="Tools\log4qt\varia\levelmatchfilter.h" />
+    <QtMoc Include="Tools\log4qt\varia\denyallfilter.h" />
+    <QtMoc Include="Tools\log4qt\varia\debugappender.h" />
+    <QtMoc Include="Tools\log4qt\spi\filter.h" />
+    <QtMoc Include="Tools\log4qt\helpers\logobject.h" />
+    <QtMoc Include="Tools\log4qt\helpers\configuratorhelper.h" />
+    <ClInclude Include="Tools\log4qt\hierarchy.h" />
+    <ClInclude Include="Tools\log4qt\level.h" />
+    <ClInclude Include="Tools\log4qt\log4qt.h" />
+    <ClInclude Include="Tools\log4qt\loggerrepository.h" />
+    <ClInclude Include="Tools\log4qt\loggingevent.h" />
+    <ClInclude Include="Tools\log4qt\logmanager.h" />
+    <ClInclude Include="Tools\log4qt\mdc.h" />
+    <ClInclude Include="Tools\log4qt\ndc.h" />
+    <ClInclude Include="Tools\log4qt\propertyconfigurator.h" />
+    <QtMoc Include="Tools\log4qt\writerappender.h" />
+    <QtMoc Include="Tools\log4qt\ttcclayout.h" />
+    <QtMoc Include="Tools\log4qt\simplelayout.h" />
+    <QtMoc Include="Tools\log4qt\rollingfileappender.h" />
+    <QtMoc Include="Tools\log4qt\patternlayout.h" />
+    <QtMoc Include="Tools\log4qt\logger.h" />
+    <QtMoc Include="Tools\log4qt\layout.h" />
+    <QtMoc Include="Tools\log4qt\fileappender.h" />
+    <QtMoc Include="Tools\log4qt\dailyrollingfileappender.h" />
+    <QtMoc Include="Tools\log4qt\consoleappender.h" />
+    <QtMoc Include="Tools\log4qt\appenderskeleton.h" />
+    <QtMoc Include="Tools\log4qt\appender.h" />
+    <ClInclude Include="Tools\Utils.h" />
+    <QtMoc Include="Tools\SetImageClass.h" />
+    <QtMoc Include="Tools\MyScrollArea.h" />
+    <QtMoc Include="RtcSdk\SRTCControl.h" />
+    <QtMoc Include="NetWork\HttpNetwork.h" />
+    <QtMoc Include="Global\GlobalDataClass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Global\GlobalDataClass.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="NetWork\HttpNetwork.cpp" />
+    <ClCompile Include="NetWork\WebApiClass.cpp" />
+    <ClCompile Include="RtcSdk\SRTCControl.cpp" />
+    <ClCompile Include="RtcSdk\VideoDevice.cpp" />
+    <ClCompile Include="Tools\FlowLayout.cpp" />
+    <ClCompile Include="Tools\log4qt\appenderskeleton.cpp" />
+    <ClCompile Include="Tools\log4qt\basicconfigurator.cpp" />
+    <ClCompile Include="Tools\log4qt\consoleappender.cpp" />
+    <ClCompile Include="Tools\log4qt\dailyrollingfileappender.cpp" />
+    <ClCompile Include="Tools\log4qt\fileappender.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\classlogger.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\configuratorhelper.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\datetime.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\factory.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\initialisationhelper.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\logerror.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\logobject.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\logobjectptr.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\optionconverter.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\patternformatter.cpp" />
+    <ClCompile Include="Tools\log4qt\helpers\properties.cpp" />
+    <ClCompile Include="Tools\log4qt\hierarchy.cpp" />
+    <ClCompile Include="Tools\log4qt\layout.cpp" />
+    <ClCompile Include="Tools\log4qt\level.cpp" />
+    <ClCompile Include="Tools\log4qt\log4qt.cpp" />
+    <ClCompile Include="Tools\log4qt\logger.cpp" />
+    <ClCompile Include="Tools\log4qt\loggerrepository.cpp" />
+    <ClCompile Include="Tools\log4qt\loggingevent.cpp" />
+    <ClCompile Include="Tools\log4qt\logmanager.cpp" />
+    <ClCompile Include="Tools\log4qt\mdc.cpp" />
+    <ClCompile Include="Tools\log4qt\ndc.cpp" />
+    <ClCompile Include="Tools\log4qt\patternlayout.cpp" />
+    <ClCompile Include="Tools\log4qt\propertyconfigurator.cpp" />
+    <ClCompile Include="Tools\log4qt\rollingfileappender.cpp" />
+    <ClCompile Include="Tools\log4qt\simplelayout.cpp" />
+    <ClCompile Include="Tools\log4qt\spi\filter.cpp" />
+    <ClCompile Include="Tools\log4qt\ttcclayout.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\debugappender.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\denyallfilter.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\levelmatchfilter.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\levelrangefilter.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\listappender.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\nullappender.cpp" />
+    <ClCompile Include="Tools\log4qt\varia\stringmatchfilter.cpp" />
+    <ClCompile Include="Tools\log4qt\writerappender.cpp" />
+    <ClCompile Include="Tools\MyScrollArea.cpp" />
+    <ClCompile Include="Tools\SetImageClass.cpp" />
+    <ClCompile Include="Tools\Utils.cpp" />
+    <ClCompile Include="View\Common\ChatControl.cpp" />
+    <ClCompile Include="View\Common\ChatMyWidget.cpp" />
+    <ClCompile Include="View\Common\ChatWidget.cpp" />
+    <ClCompile Include="View\Common\ChatYouWidget.cpp" />
+    <ClCompile Include="View\Common\ImageTipsWidgetWidget.cpp" />
+    <ClCompile Include="View\Common\MicIconView.cpp" />
+    <ClCompile Include="View\Common\RoundLoadingWidget.cpp" />
+    <ClCompile Include="View\Common\TanChuWid.cpp" />
+    <ClCompile Include="View\Common\WidBtn.cpp" />
+    <ClCompile Include="View\Common\WidDialog.cpp" />
+    <ClCompile Include="View\Common\WidgetClick.cpp" />
+    <ClCompile Include="View\Home\WidHome.cpp" />
+    <ClCompile Include="View\Home\WidUserInfo.cpp" />
+    <ClCompile Include="View\Login\WidLogin.cpp" />
+    <ClCompile Include="View\Login\WidRegister.cpp" />
+    <ClCompile Include="View\Room\WidDeviceList.cpp" />
+    <ClCompile Include="View\Room\WidDiaplayView.cpp" />
+    <ClCompile Include="View\Room\WidRoom.cpp" />
+    <ClCompile Include="View\Room\WidSetData.cpp" />
+    <ClCompile Include="widget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="res\res.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="View\Common\ChatMyWidget.ui" />
+    <QtUic Include="View\Common\ChatWidget.ui" />
+    <QtUic Include="View\Common\ChatYouWidget.ui" />
+    <QtUic Include="View\Common\ImageTipsWidgetWidget.ui" />
+    <QtUic Include="View\Common\WidBtn.ui" />
+    <QtUic Include="View\Common\WidDialog.ui" />
+    <QtUic Include="View\Home\WidHome.ui" />
+    <QtUic Include="View\Home\WidUserInfo.ui" />
+    <QtUic Include="View\Login\WidLogin.ui" />
+    <QtUic Include="View\Login\WidRegister.ui" />
+    <QtUic Include="View\Room\WidDeviceList.ui" />
+    <QtUic Include="View\Room\WidDiaplayView.ui" />
+    <QtUic Include="View\Room\WidRoom.ui" />
+    <QtUic Include="View\Room\WidSetData.ui" />
+    <QtUic Include="widget.ui" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{86E1180B-E4D9-47F0-8DC0-150944D79F99}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">10.0.22621.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="QtSettings">
+    <QtInstall>msvc_qt_15_2</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="QtSettings">
+    <QtInstall>msvc_qt_15_2</QtInstall>
+    <QtModules>core;gui;widgets;network</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">
+    <IncludePath>$(SolutionDir);$(SolutionDir)Tools;$(SolutionDir)RtcSdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)RtcSdk\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\out</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Link>
+      <AdditionalDependencies>RTCEngine.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

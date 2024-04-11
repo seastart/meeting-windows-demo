@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WidDialog</class>
+ <widget class="QWidget" name="WidDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>275</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="styleSheet">
+      <string notr="true">QWidget#widget{
+background:#fff;
+}</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <property name="leftMargin">
+       <number>65</number>
+      </property>
+      <property name="topMargin">
+       <number>32</number>
+      </property>
+      <property name="rightMargin">
+       <number>65</number>
+      </property>
+      <property name="bottomMargin">
+       <number>32</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">font-size:24px;
+font-weight:bold;
+</string>
+          </property>
+          <property name="text">
+           <string>标题</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QStackedWidget" name="stackedWidget">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="page_label">
+           <layout class="QGridLayout" name="gridLayout_3">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="lblMsg">
+              <property name="styleSheet">
+               <string notr="true">font-size:16px;</string>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_led">
+           <layout class="QGridLayout" name="gridLayout_4">
+            <property name="spacing">
+             <number>16</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="lblLed"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_radios">
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QWidget" name="widRadios" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_2"/>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>26</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="btnCancel">
+            <property name="text">
+             <string>取消</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOk">
+            <property name="text">
+             <string>确定</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

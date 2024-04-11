@@ -3,3 +3,8 @@
 ################################################################################
 
 /CPP/MSVC-QT/.vs/smeeting-windows-demo/v16
+/CPP/MSVC-QT/Debug/qmake
+/CPP/MSVC-QT/Release
+/CPP/MSVC-QT/smeeting-windows-demo.vcxproj.user
+/CPP/MSVC-QT/srtc_win_demo.pro.user
+/CPP/out

@@ -1,0 +1,45 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Qss/base.qss</file>
+        <file>Images/avatar.png</file>
+        <file>Images/bcspeaker.png</file>
+        <file>Images/bospeaker.png</file>
+        <file>Images/bshare.png</file>
+        <file>Images/bsharestop.png</file>
+        <file>Images/cam.png</file>
+        <file>Images/camc.png</file>
+        <file>Images/chatWithMessage.png</file>
+        <file>Images/checkbox_unchecked.png</file>
+        <file>Images/close.png</file>
+        <file>Images/mic.png</file>
+        <file>Images/micc.png</file>
+        <file>Images/mincam.png</file>
+        <file>Images/mincamc.png</file>
+        <file>Images/minmic.png</file>
+        <file>Images/minmicc.png</file>
+        <file>Images/radio_checked.png</file>
+        <file>Images/logo.png</file>
+        <file>Images/bchat.png</file>
+        <file>Images/logo2.png</file>
+        <file>Images/组 9565.png</file>
+        <file>Images/ledeye.png</file>
+        <file>Images/ledeye2.png</file>
+        <file>Images/ledpass.png</file>
+        <file>Images/leduser.png</file>
+        <file>Images/select.png</file>
+        <file>Images/unclick.png</file>
+        <file>Images/triangle2.png</file>
+        <file>Images/triangle4.png</file>
+        <file>Images/组 9213.png</file>
+        <file>Images/hccam.png</file>
+        <file>Images/hcmic.png</file>
+        <file>Images/hcspeaker.png</file>
+        <file>Images/hocam.png</file>
+        <file>Images/homic.png</file>
+        <file>Images/hospeaker.png</file>
+        <file>Images/close1.png</file>
+        <file>Images/icon.png</file>
+        <file>Images/barrow0.png</file>
+        <file>Images/barrow1.png</file>
+    </qresource>
+</RCC>

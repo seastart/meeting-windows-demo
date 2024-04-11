@@ -1,0 +1,92 @@
+﻿QWidget
+{
+    color:#333;
+    font-size:14px;
+}
+
+QLineEdit{
+    padding:16px 12px;
+    border: 1px solid #E7E7E7;
+    border-radius:5px;
+}
+QLineEdit:hover{border: 1px solid #0039B3;}
+
+QPushButton[ShowType="Normal"]
+{
+        color: #fff;
+        background: #0039B3;
+        border-radius: 5px;
+        padding:12px;
+}
+QPushButton[ShowType="Normal"]:hover:!pressed{background:#1049c3;}
+QPushButton[ShowType="Normal"]:pressed{background:#1850c9;}
+
+QPushButton[ShowType="NormalCancel"]
+{
+        background: #fff;
+        color:#0039B3;
+        border:1px solid #0039B3;
+        border-radius: 5px;
+        padding:12px;
+}
+QPushButton[ShowType="NormalCancel"]:hover:!pressed{color:#1049c3;border:1px solid #1049c3;}
+QPushButton[ShowType="NormalCancel"]:pressed{color:#1850c9;border:1px solid #1850c9;}
+
+
+QPushButton[ShowType="NormalRed"]
+{
+        color: #fff;
+        background: #e84848;
+        border-radius: 5px;
+        padding:12px;
+}
+QPushButton[ShowType="NormalRed"]:hover:!pressed{background:#f85252;}
+QPushButton[ShowType="NormalRed"]:pressed{background:#Ff5858;}
+
+QPushButton[ShowType="NormalCancelRed"]
+{
+        background: #fff;
+        color:#e05252;
+        border:1px solid #e05252;
+        border-radius: 5px;
+        padding:12px;
+}
+QPushButton[ShowType="NormalCancelRed"]:hover:!pressed{color:#e85252;border:1px solid #e85252;}
+QPushButton[ShowType="NormalCancelRed"]:pressed{color:#Ff5858;border:1px solid #Ff5858;}
+
+
+QRadioButton:unchecked{
+    color:#333;
+}
+QRadioButton:checked{
+    color:#0039B3;
+}
+
+QRadioButton::indicator:unchecked{
+
+    image:url(:/Images/checkbox_unchecked.png);
+}
+
+QRadioButton::indicator:checked{
+
+    image: url(:/Images/radio_checked.png);
+}
+
+QCheckBox::indicator:unchecked{
+    image:url(:/Images/unclick.png);
+}
+
+QCheckBox::indicator:checked{
+    image: url(:/Images/select.png);
+}
+
+
+QScrollBar:vertical{width:8px;background:rgba(0,0,0,0%);margin:0px;padding-left:0px;padding-top:0px;padding-bottom:0px;}
+QScrollBar::handle:vertical{width:8px;background:rgb(125, 125, 125); border-radius:4px;min-height:20;}
+QScrollBar::handle:vertical:hover{width:8px;background:rgb(51, 51, 51);border-radius:4px;min-height:20;}
+QScrollBar::sub-page:vertical{background:rgba(0,0,0,0%);border-top-right-radius:4px;border-top-left-radius:4px;}
+QScrollBar::add-page:vertical{background:rgba(0,0,0,0%);border-bottom-right-radius:4px;border-bottom-left-radius:4px;}
+QScrollBar::add-line:vertical{height:9px;width:8px;background:rgba(0,0,0,0);subcontrol-position:bottom;}
+QScrollBar::sub-line:vertical{height:9px;width:8px;background:rgba(0,0,0,0);subcontrol-position:top;}
+QScrollBar::add-line:vertical:hover{height:9px;width:8px;background:rgba(0,0,0,0);subcontrol-position:bottom;}
+QScrollBar::sub-line:vertical:hover{height:9px;width:8px;background:rgba(0,0,0,0);subcontrol-position:top;}

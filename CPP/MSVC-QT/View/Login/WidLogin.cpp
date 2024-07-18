@@ -3,8 +3,7 @@
 #include <Global/GlobalDataClass.h>
 
 #include "NetWork/HttpNetwork.h"
-#include "RtcSdk/SRTCControl.h"
-#include "../SRTCControl.h"
+#include "SMeetingSDK/SMeetControl.h"
 #include "../Common/ImageTipsWidgetWidget.h"
 #include "../../Tools/Utils.h"
 #include "../Common/WidDialog.h"
@@ -23,9 +22,11 @@ WidLogin::WidLogin(QWidget *parent) :
     qDebug() << __func__;
     ui->btnLogin->setProperty("ShowType", "Normal");
     ui->lblversion->setText(GlobalDataClass::Get()->GetVersion());
-    ui->lblversion2->setText(SRTCControl::Get()->SdkVersion());
+    ui->lblversion2->setText(SMeetControl::Get()->SdkVersion());
 
     ui->ledName->setText(GlobalDataClass::Get()->GetSettingName());
+    ui->ledPass->setText(GlobalDataClass::Get()->GetSettingPass());
+    ui->ledHost->setText(GlobalDataClass::Get()->GetSettingDomain());
 
     QGraphicsDropShadowEffect* shadow_effect = new QGraphicsDropShadowEffect(this);
     shadow_effect->setOffset(3, 3);              //阴影的偏移量
@@ -67,6 +68,8 @@ WidLogin::WidLogin(QWidget *parent) :
     connect(codeTimer, SIGNAL(timeout()), this, SLOT(OnCodeTimer()));
     codeCount = 0;
 
+    connect(SMeetControl::Get(),SIGNAL(smtLoginFinish(int)),this,SLOT(OnLoginFinish(int)));
+
     on_rbtnPass_clicked();
 }
 
@@ -98,29 +101,79 @@ void WidLogin::OnCodeTimer()
     }
 }
 
+void WidLogin::OnLoginFinish(int code)
+{
+    if (!code) {
+        emit LoginFinish(); 
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 登录异常：%1").arg((int)code));
+    }
+}
+
+void WidLogin::on_pushbuttom_2_clicked()
+{
+    return ;
+}
+void WidLogin::on_pushbuttom_3_clicked()
+{
+    return;
+}
+
 void WidLogin::on_btnLogin_clicked()
 {
     if (!ui->chkAgreement->isChecked()) {
         ImageTipsWidgetWidget::DisplayDialog(nullptr,tr("请先勾线隐私协议。"));
         return;
     }
+    SMeeting::StatusCode code = SMeetControl::Get()->InitSDK(ui->ledRtcHost->text());
+    if((int)code){
+        ImageTipsWidgetWidget::DisplayDialog(nullptr,tr("SDK 初始化异常：%1").arg((int)code));
+        return;
+    }
+
+    GlobalDataClass::Get()->SetSettingDomain(ui->ledHost->text());
+    GlobalDataClass::Get()->SetSettingName(ui->ledName->text());
+    GlobalDataClass::Get()->SetSettingPass(ui->ledPass->text());
 
     HttpNetwork::Get()->SetHost(ui->ledHost->text());
 
-    WebApiClass::ServerUser_AuthGrant(ui->ledName2->text(), [&] (QByteArray& byte){
+    SMeetControl::Get()->sdkInfo.userid = ui->ledName->text();
+    WebApiClass::AuthLogin_Account(ui->ledName->text(),ui->ledPass->text(), [&](QByteArray& byte) {
         QJsonObject obj = QJsonDocument::fromJson(byte).object();
         int code = -1;
         JsonUtil::GetValue(obj,"code",code);
         if (!code) {
-            QString data;
-            JsonUtil::GetValue(obj, "msg", data);
-            SRTCControl::Get()->LoginUser(ui->ledHost->text(),);
-            emit LoginFinish();
+            QJsonObject data;
+            JsonUtil::GetValue(obj, "data", data);
+            
+            QString jwt_token;
+            JsonUtil::GetValue(data,"jwt_token",jwt_token);
+            HttpNetwork::Get()->SetToken(jwt_token);
+
+            
+
+            WebApiClass::Meeting_Grant([&](QByteArray &byte) {
+                qDebug() << __func__ << byte;
+                QJsonObject obj = QJsonDocument::fromJson(byte).object();
+                int code = -1;
+                JsonUtil::GetValue(obj, "code", code);
+                if (!code) {
+                    QString data = "";
+                    JsonUtil::GetValue(obj, "data", data);
+                    SMeetControl::Get()->LoginUser(data);
+                }
+                else {
+                    QString msg;
+                    JsonUtil::GetValue(obj, "msg", msg);
+                    ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("WebApiClass::Meeting_Grant fail:") + msg);
+                }
+            });
         }
         else {
             QString msg;
             JsonUtil::GetValue(obj, "msg", msg);
-            ImageTipsWidgetWidget::DisplayDialog(nullptr,tr("WebApiClass::ServerUser_AuthGrant fail:")+msg);
+            ImageTipsWidgetWidget::DisplayDialog(nullptr,tr("WebApiClass::AuthLogin_Account fail:")+msg);
         }
         });
 }
@@ -135,19 +188,10 @@ void  WidLogin::on_rbtnCode_clicked()
 {
     ui->stackedWidget->setCurrentIndex(1);
 }
-#include "View/Room/WidDeviceList.h"
+
 void  WidLogin::on_btnRegister_clicked()
 {
-    WidDeviceList* w = WidDeviceList::InitAudioDevices(DEFAULTDEVICENAME, DEFAULTDEVICENAME);
-    if (w) {
-        w->show();
-        w->setFixedWidth(250+40);
-        QPoint p = ui->btnRegister->mapToGlobal(QPoint(0, 0));
-        p.setX(p.x() + (ui->btnRegister->width() - (250 + 40)) / 2);
-        p.setY(p.y() - w->height());
-        w->move(p);
-    }
-    return;
+    HttpNetwork::Get()->SetHost(ui->ledHost->text());
     emit Register();
 }
 

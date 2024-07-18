@@ -2,22 +2,29 @@
 #include "ui_WidDiaplayView.h"
 #include "../../Tools/SetImageClass.h"
 #include <QDebug>
+#include <qcombobox.h>
+#include "LoadingWidget.h"
+#pragma execution_character_set("utf-8")
 WidDiaplayView::WidDiaplayView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidDiaplayView),
     widTile(nullptr)
 {
     ui->setupUi(this);
-    qDebug() << __func__;
     _track = -1;
+    netIndex = -1;
     InitTileView();
-    SetToolCam(false);
-    //ui->stackedWidget->setCurrentWidget(ui->page_def);
+    lblLoading = new LoadingWidget(this);
+    lblLoading->setColor(QColor(0xdd, 0xdd, 0xdd));
+    lblLoading->resize(30, 30);
+    lblLoading->hide();
+    lblLoading->raise();
+    lblLoading->stopAnimation();
+    camViewShow = false;
 }
 
 WidDiaplayView::~WidDiaplayView()
 {
-    qDebug() << __func__;
     SetImageClass::StopPortraitImageDownLoad(_portrait);
     delete ui;
 }
@@ -35,98 +42,113 @@ void WidDiaplayView::SetToolName(QString s)
     ledName->setText(nameString);
     widTile->adjustSize();
 }
-void WidDiaplayView::SetToolMic(bool v)
+void WidDiaplayView::SetToolMic(int v)
 {
-#ifdef DRAEMICICON
-    ledMic->OpenDev(v);
-#else
-    ledMic->setPixmap(QPixmap(v?":/Images/minmic.png":":/Images/minmicc.png"));
+#if 0
+    bool newAudioState = (v >= 0);
+    QString imageName = ":/Images/bcmic.png";
+    if (newAudioState)
+    {
+        imageName = QString(":/Images/bomic%1.png").arg(v);
+    }
 #endif
+    QString imageName = ":/Images/bcmic.png";
+    if (v)
+    {
+        imageName = QString(":/Images/bomic0.png");
+    }
+
+    ledMic->setPixmap(QPixmap(imageName));       //当前状态
+    //ledMic->setPixmap(QPixmap(v?":/image/bomic0.png":":/image/bcmic.png"));
     //ledMic->setText((v?"m1":"m0"));
+}
+
+
+void WidDiaplayView::SetToolNet(int v)
+{
+    if (netIndex != v)
+    {
+        netIndex = v;
+        QString netImage = QString(":/Images/net%1.png").arg(netIndex);
+        ledNet->setPixmap(QPixmap(netImage));
+    }
 }
 
 void WidDiaplayView::SetToolPortrait(QString p)
 {
     _portrait = p;
-    SetImageClass::SetPortraitImage(ui->label_5,_key,p,":/Images/avatar.png");
+    //mm
+    //SetImageClass::SetPortraitImage(ui->label_5,_key,p,":/image/avatar.png");
 }
 
-void WidDiaplayView::SetToolCam(bool v)
+void WidDiaplayView::SetToolCam(bool v,bool load)
 {
-    ledCam->setPixmap(QPixmap(v?":/Images/mincam.png":":/Images/mincamc.png"));
-    //ledCam->setText((v?"c1":"c0"));
-
-}
-
-void WidDiaplayView::UpdateAudioDB(int db)
-{
-#ifdef DRAEMICICON
-    if (ledMic) {
-        ledMic->AddDb(db);
-    }
-#endif
-}
-
-void WidDiaplayView::SetShowView(bool v)
-{
+    camViewShow = v;
+    camLoading = load;
     if(!v){
-        lblView->setUpdatesEnabled(true);
         ui->widget_back->show();
-        //ui->stackedWidget->setCurrentWidget(ui->page_def);
+        if (lblLoading) {
+            lblLoading->hide();
+            lblLoading->stopAnimation();
+        }
     }else{
-        lblView->setUpdatesEnabled(false);
         ui->widget_back->hide();
-        //ui->stackedWidget->setCurrentWidget(ui->page_cam);
+        if (lblLoading) {
+            if (load) {
+                lblLoading->raise();
+                lblLoading->show();
+                lblLoading->startAnimation();
+            }
+            else {
+                lblLoading->hide();
+                lblLoading->stopAnimation();
+            }
+        }
     }
+
+
 }
 
-void WidDiaplayView::mousePressEvent(QMouseEvent *event){
-    QWidget::mousePressEvent(event);
-    emit Clicked();
+void WidDiaplayView::ClearView()
+{
+    //刷去历史残留数据
+    lblView->updateFull(0,0,0);
 }
+
 void WidDiaplayView::resizeEvent(QResizeEvent *event){
     TileViewMove();
-    if(lblView){
+    lblLoading->move((event->size().width() - lblLoading->width()) / 2, (event->size().height() - lblLoading->height()) / 2);
+ 	if(lblView){
         lblView->resize(event->size());
     }
-    
     QWidget::resizeEvent(event);
 }
 
 void WidDiaplayView::InitTileView()
 {
-    qDebug() << __func__;
     widTile = new QWidget(this);
     widTile->setObjectName("widTile");
-    widTile->setStyleSheet("QWidget#widTile{background:#333;border-radius:8px;}QWidget{color:#fff;}");
+    widTile->setStyleSheet("QWidget#widTile{background:#333;border-radius:8px;}QWidget{color:#fff;}QLabel{font-size:13px;}");
     QHBoxLayout *l = new QHBoxLayout(widTile);
     l->setSpacing(6);
     l->setContentsMargins(10,8,10,8);
     widTile->setLayout(l);
-#ifdef DRAEMICICON
-    ledMic = new MicIconView(widTile);
-    //ledMic->setText("m0");
-    ledMic->SetBackColor(QColor(0xff, 0xff, 0xff));
-#else
     ledMic = new QLabel(widTile);
-    ledMic->setText("m0");
-#endif
+    ledMic->setScaledContents(true);
     ledMic->setFixedSize(16,16);
     ledName = new QLabel(widTile);
-    ledName->setText("");
     ledName->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
-    ledCam = new QLabel(widTile);
-    ledCam->setFixedSize(16,16);
-    ledCam->setText("c0");
+    ledNet = new QLabel(widTile);
+    ledNet->setFixedSize(16,16);
     l->addWidget(ledMic);
-    l->addWidget(ledCam);
+    l->addWidget(ledNet);
     l->addWidget(ledName);
     widTile->setMinimumWidth(100);
-    widTile->setMaximumWidth(200);
+    widTile->setMaximumWidth(250);
     widTile->adjustSize();
     widTile->show();
 
-    lblView = new QLabel(this);
+    lblView = new QtRenderView(this);
     lblView->lower();
     lblView->show();
     TileViewMove();
@@ -135,12 +157,17 @@ void WidDiaplayView::InitTileView()
 void WidDiaplayView::TileViewMove()
 {
     if(widTile){
-        widTile->move(10,this->height() - 10 - widTile->height());
+        widTile->move(10, this->height() - 10 - widTile->height());
     }
 }
 
 
-QWidget* WidDiaplayView::GetShowViewWidget()
+SMeeting::IRTCView* WidDiaplayView::GetShowViewWidget()
 {
     return lblView;
+}
+
+void WidDiaplayView::SetKey(QString k)
+{
+    _key = k;
 }

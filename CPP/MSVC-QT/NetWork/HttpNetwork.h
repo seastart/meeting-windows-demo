@@ -18,11 +18,11 @@ public:
 
 	static HttpNetwork* Get();
 
-	// 设置请求地址
 	void SetHost(QString inHost);
-
-	// 获取地址
 	QString Host();
+
+	void SetToken(QString tk);
+	QString Token();
 
 	// 下载文件
 	static void OnDownload(
@@ -32,6 +32,9 @@ public:
 	static void OnPost(
 		const char* url,
 		QByteArray value,
+		std::function<void(QByteArray& byte)> function);
+	static void OnGet(
+		const char* url,
 		std::function<void(QByteArray& byte)> function);
 
 	static void ClearUrlPost(QString url);
@@ -43,6 +46,8 @@ private:
 	QNetworkAccessManager* network;
 	// 请求地址
 	QString host;
+
+	QString token;
 
 	// 创建request
     QNetworkRequest CreateRequest(QString urlString);

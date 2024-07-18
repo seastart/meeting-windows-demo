@@ -2,12 +2,11 @@
 #include "ui_WidHome.h"
 #include "../Common/ChatControl.h"
 #include "../Common/WidDialog.h"
-#include "../RtcSdk/SRTCControl.h"
+#include "../SMeetingSdk/SMeetControl.h"
 #include "../Common/ImageTipsWidgetWidget.h"
 #include "../../DataModel/RoomDataModel.h"
 #include "../Common/RoundLoadingWidget.h"
 #include "Global/GlobalDataClass.h"
-#include "../RtcSdk/SRTCControl.h"
 #include <QGraphicsDropShadowEffect>
 #include "WidUserInfo.h"
 
@@ -50,8 +49,8 @@ WidHome::WidHome(QWidget *parent) :
     ui->btnCamera->setImgText(curCam ? tr("关闭摄像头") : tr("打开摄像头"), curCam ? ":/Images/hocam.png" : ":/Images/hccam.png");
     //ui->btnSpeaker->setImgText(curSpeaker ? tr("关闭扬声器") : tr("打开扬声器"), curSpeaker ? ":/Images/hospeaker.png" : ":/Images/hcspeaker.png");
     
-    
-
+    connect(SMeetControl::Get(),SIGNAL(smtCreateFinish(int, QString)),this,SLOT(OnCreateFinish(int, QString)));
+    connect(SMeetControl::Get(), SIGNAL(smtEnterRoomFinish(int, QString)), this, SLOT(OnEnterRoomFinish(int, QString)));
     ui->widget_3->hide();
 }
 
@@ -63,35 +62,39 @@ WidHome::~WidHome()
 void WidHome::InitData()
 {
     qDebug() << __func__;
+    ReUpdate();
 }
 
 void WidHome::ReUpdate()
 {
     qDebug() << __func__;
-    SdkInfo& si = SRTCControl::Get()->sdkInfo;
-    ui->lblUser->setText(tr("uid：") + si.userid + tr("，昵称：")+si.userName);
+    SdkInfo& si = SMeetControl::Get()->sdkInfo;
+    //ui->lblUser->setText(tr("uid：") + si.userid + tr("，昵称：")+si.userName);
+    ui->lblUser->setText(si.userid);
+    ui->ledRoomName->setText(si.userid);
 }
 
 void WidHome::on_btnJoin_clicked()
 {
+    ui->ledRoomNo->setText(GlobalDataClass::Get()->GetSettingRoomId());
     ui->widget_2->hide();
     ui->widget_3->show();
     ui->label_8->setText(tr("加入房间"));
+    ui->ledRoomNo->setReadOnly(false);
 
 }
 
 void WidHome::on_btnCreate_clicked()
 {
-    ui->widget_2->hide();
-    ui->widget_3->show();
-    ui->label_8->setText(tr("创建房间"));
-
+    SMeetControl::Get()->CreateRoom(SMeetControl::Get()->sdkInfo.userid + tr("的会议"));
 }
 
 
 void WidHome::on_btnJoin2_clicked()
 {
-    emit JoinFinish();
+    QString roomNo = ui->ledRoomNo->text();
+    GlobalDataClass::Get()->SetSettingRoomId(roomNo);
+    SMeetControl::Get()->EnterRoom(roomNo,ui->ledRoomName->text());
 }
 
 void WidHome::on_btnClose2_clicked()
@@ -125,14 +128,36 @@ void WidHome::on_widget_4_Clicked()
     wui->show();
 }
 
-
-void WidHome::OnLoginFinish(QString user,QString opt)
+void WidHome::OnCreateFinish(int code, QString data)
 {
-    qDebug()<<__func__<<user;
-    MemberDataModel lum;
-    lum.Load(QJsonDocument::fromJson(user.toUtf8()).object());
-    qDebug()<<__func__<<"my self:"<<lum.uid()<<lum.name();
-    ui->lblUser->setText(tr("uid：") + lum.uid() + tr("，昵称：")+lum.name());
+    if (!code) {
+        ui->ledRoomNo->setReadOnly(true);
+        ui->widget_2->hide();
+        ui->widget_3->show();
+        ui->label_8->setText(tr("创建房间"));
+
+        QJsonObject obj = JsonUtil::GetJsonObjectFromString(data.toStdString());
+        if (!obj.isEmpty()) {
+            QString roomNo = "";
+            JsonUtil::GetValue(obj, "roomNo", roomNo);
+            ui->ledRoomNo->setText(roomNo);
+        }
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 创建房间异常：%1,%2").arg((int)code).arg(QString(data)));
+    }
+}
+
+void WidHome::OnEnterRoomFinish(int code, QString data)
+{
+    if (!code) {
+        SMeetControl::Get()->sdkInfo.userName = ui->ledRoomName->text();
+        SMeetControl::Get()->sdkInfo.roomid = ui->ledRoomNo->text();
+        emit JoinFinish(curMic, curCam);
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 加入房间异常：%1,%2").arg((int)code).arg(QString(data)));
+    }
 }
 
 void WidHome::OnChatClicked()
@@ -146,7 +171,7 @@ void WidHome::OnBtnUnLoginClicked()
 {
     qDebug() << __func__;
     GlobalDataClass::Get()->DisplayDialogLabel(this,tr("退出登录"),tr("您确定退出登录吗"),"",[&](QString){
-            SRTCControl::Get()->Logout();
+            SMeetControl::Get()->Logout();
             emit UnLogin();
             return true;
     },"","",WidDialog::DialogColor_Red);

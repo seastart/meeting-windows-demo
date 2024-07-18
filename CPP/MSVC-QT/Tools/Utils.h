@@ -14,4 +14,5 @@ public:
 
     static int app_cpu();
     static float GetMemoryUse();
+    static QString GetRandData(int len = 16);
 };

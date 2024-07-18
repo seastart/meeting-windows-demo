@@ -4,7 +4,7 @@
 #include "ChatYouWidget.h"
 #include "../Tools/FlowLayout.h"
 #include <QDateTime>
-#include "../../RtcSdk/SRTCControl.h"
+#include "../../SMeetingSdk/SMeetControl.h"
 #include "ImageTipsWidgetWidget.h"
 ChatControl* ChatControl::_cc = nullptr;
 #pragma execution_character_set("utf-8")
@@ -15,7 +15,7 @@ ChatControl::ChatControl(QObject *parent)
     _layout = nullptr;
     _longTimer = nullptr;
     needAddDate = true;
-    connect(SRTCControl::Get(),SIGNAL(RecvMsg(QString,QString,QString)),this,SLOT(OnRecvMsg(QString,QString,QString)));
+    connect(SMeetControl::Get(),SIGNAL(RecvMsg(QString,QString,QString)),this,SLOT(OnRecvMsg(QString,QString,QString)));
 
 }
 
@@ -59,13 +59,13 @@ void ChatControl::OnSendMsg(QString tar,QString msg)
     qDebug() << __func__;
     int ret;
     if(tar.isEmpty()){
-        ret = SRTCControl::Get()->SendRoomMsg("default",msg);
+        ret = SMeetControl::Get()->SendRoomMsg("default",msg);
     }else{
-        ret = SRTCControl::Get()->SendMsg(tar,"default",msg);
+        ret = SMeetControl::Get()->SendMsg(tar,"default",msg);
     }
     qDebug()<<__func__<<ret;
     if(ret){
-        ImageTipsWidgetWidget::DisplayDialog(_cw,tr("发送异常%1,msg：%2").arg(ret).arg(SRTCControl::Get()->GetCodeMsg(ret)));
+        ImageTipsWidgetWidget::DisplayDialog(_cw,tr("发送异常%1,msg：%2").arg(ret).arg(SMeetControl::Get()->GetCodeMsg(ret)));
     }
 //    if(ret){
 //        AddMsgView(_myId,_myName,_myPortrait,msg);
@@ -79,7 +79,7 @@ void ChatControl::AddMsgView(QString sid,QString sname,QString portrait,QString 
         AddTimeDate();
     }
     IChatBase* ichat = nullptr;
-    if(sid == SRTCControl::Get()->sdkInfo.userid){
+    if(sid == SMeetControl::Get()->sdkInfo.userid){
         ichat = new ChatMyWidget(_cw->GetViewWidget());
     }else{
         ichat = new ChatYouWidget(_cw->GetViewWidget());

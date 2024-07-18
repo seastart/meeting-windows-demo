@@ -4,7 +4,7 @@
 #include <qpushbutton.h>
 #include <qradiobutton.h>
 #include <qcheckbox.h>
-#include "RtcSdk/VideoDevice.h"
+#include "SMeetingSdk/VideoDevice.h"
 #pragma execution_character_set("utf-8")
 WidDeviceList::WidDeviceList(QWidget *parent)
 	: TanChuWid(parent)
@@ -29,9 +29,9 @@ WidDeviceList::~WidDeviceList()
 WidDeviceList* WidDeviceList::InitAudioDevices(QString curMic,QString curSpk)
 {
     DeviceList a_dl;
-    SRTCControl::Get()->EnumMicDev(a_dl);
+    SMeetControl::Get()->EnumMicDev(a_dl);
     DeviceList s_dl;
-    SRTCControl::Get()->EnumSpeakerDev(s_dl);
+    SMeetControl::Get()->EnumSpeakerDev(s_dl);
    
     
     if (!a_dl.GetDeviceSize() && !s_dl.GetDeviceSize()) {
@@ -77,7 +77,7 @@ WidDeviceList* WidDeviceList::InitAudioDevices(QString curMic,QString curSpk)
 WidDeviceList* WidDeviceList::InitVideoDevices(QString cur)
 {
     VideoDeviceList a_dl;
-    SRTCControl::Get()->EnumCameraDev(a_dl);
+    SMeetControl::Get()->EnumCameraDev(a_dl);
 
 
     if (!a_dl.GetDeviceSize()) {

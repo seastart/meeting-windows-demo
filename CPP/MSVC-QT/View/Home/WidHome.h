@@ -32,14 +32,13 @@ private slots:
 
     void OnBtnUnLoginClicked();
 
-
-    void OnLoginFinish(QString,QString);
-
     void on_btnMic_clicked();
     void on_btnCamera_clicked();
     void on_widget_4_Clicked();
+    void OnCreateFinish(int, QString);
+    void OnEnterRoomFinish(int , QString);
 signals:
-    void JoinFinish();
+    void JoinFinish(bool,bool);
     void UnLogin();
     void JoinRoomThread(int);
 private:

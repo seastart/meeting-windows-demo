@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QWheelEvent>
-#include "RtcSdk/SRTCControl.h"
+#include "SMeetingSDK/SMeetControl.h"
 #include "../../DataModel/MemberDataModel.h"
 
 #define VIEW_DEFAULT_DEV tr("系统默认")
@@ -48,8 +48,8 @@ private slots:
     void OnDevRrecovery(int);
     void OnDevChange(int,int,QString);
     void OnDefDevChange(int,int,QString);
-    void OnMemberUserUpdate(QString);
-    void OnMemberUserLeave(QString);
+    void OnUserEnter(QString,QString);
+    void OnMemberUserLeave(QString,QString);
     void OnRoomUpdate(QString);
 
     void on_btnChat_clicked();
@@ -57,8 +57,6 @@ private slots:
     void on_btnScreen_clicked();
 
     void on_btnMic_clicked();
-
-    void on_btnSpeaker_clicked();
 
     void on_btnCamera_clicked();
 
@@ -69,19 +67,22 @@ private slots:
 
     void on_labTitle_clicked();
 
-    void OnJoinRoomFinish(QString room,QString me,QString members,QString opts);
-    void on_btnTest_clicked();
-    void OnWheelChange();
-
     void on_btnMicMore_clicked();
     void on_btnCameraMore_clicked();
+
+    void on_pushButton_clicked();
+    void OnCameraUpdate(int ,int ,QString);
+    void OnMicUpdate(int, int, QString);
+    void OnNickNameUpdate(int ,QString);
+    void OnShareUpdate(int, int, QString);
+    void OnExitRoomFinish(int,QString);
 private:
     WidDiaplayView* CreateMemberView(QString id,QString name,QString portrait);
 
 
 
     void appendMsg(QString txt);
-    bool MemberUpdate(MemberDataModel & mmd,bool v = true);
+    bool MemberUpdate(MemberDataModel & mmd);
     void MemberLeave(QString id);
     void CompapreMemberData(QString,MemberDataModel& n,bool& ac,bool& vc,bool& nc);
 
@@ -110,6 +111,8 @@ private:
     QString selectDefCameraName = "";
 
     bool needCloseRoom;
+
+    bool init_view_finish;
 };
 
 #endif // WIDROOM_H

@@ -41,5 +41,17 @@
         <file>Images/icon.png</file>
         <file>Images/barrow0.png</file>
         <file>Images/barrow1.png</file>
+        <file>Images/bcmic.png</file>
+        <file>Images/bomic0.png</file>
+        <file>Images/bomic1.png</file>
+        <file>Images/bomic2.png</file>
+        <file>Images/bomic3.png</file>
+        <file>Images/bomic4.png</file>
+        <file>Images/bomic5.png</file>
+        <file>Images/net0.png</file>
+        <file>Images/net1.png</file>
+        <file>Images/net2.png</file>
+        <file>Images/net3.png</file>
+        <file>Images/net4.png</file>
     </qresource>
 </RCC>

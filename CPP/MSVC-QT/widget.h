@@ -21,7 +21,7 @@ public:
     ~Widget();
 private slots:
     void OnLoginFinish();
-    void OnJoinFinish();
+    void OnJoinFinish(bool,bool);
     void OnUnLogin();
     void OnExitRoom();
     void OnStatusChange(int code,QString message);

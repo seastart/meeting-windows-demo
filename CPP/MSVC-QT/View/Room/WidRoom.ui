@@ -479,6 +479,25 @@ border:0px;</string>
              </widget>
             </item>
             <item>
+             <widget class="WidBtn" name="btnMember">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>成员</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="WidBtn" name="btnChat">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -532,6 +551,19 @@ border:0px;</string>
               </property>
               <property name="text">
                <string>全屏</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>测试</string>
               </property>
              </widget>
             </item>
@@ -649,8 +681,6 @@ font-size:16px;</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../res/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

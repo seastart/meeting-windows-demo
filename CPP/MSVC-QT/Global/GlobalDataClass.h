@@ -18,15 +18,7 @@ class GlobalDataClass : public QObject
 public:
 
 	//单利
-	static GlobalDataClass* Get()
-	{
-		if (!globalDataClass)
-        {
-			globalDataClass = new GlobalDataClass();
-            globalDataClass->InitGlobal();
-		}
-		return globalDataClass;
-	}
+    static GlobalDataClass* Get();
 public:
 	QString DataPath();
     QString PortraitPath();
@@ -49,6 +41,12 @@ public:
     }
     void SetSettingName(QString data){
         SetSetting("Name",data);
+    }
+    QString GetSettingPass() {
+        return GetSetting("Pass");
+    }
+    void SetSettingPass(QString data) {
+        SetSetting("Pass", data);
     }
     QString GetSettingRoomId(){
         return GetSetting("RoomId");

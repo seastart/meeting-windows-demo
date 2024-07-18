@@ -3,7 +3,15 @@
 #include <QApplication>
 #define SETTINGFILE "setting.ini"
 GlobalDataClass* GlobalDataClass::globalDataClass = nullptr;
-
+GlobalDataClass* GlobalDataClass::Get()
+{
+    if (!globalDataClass)
+    {
+        globalDataClass = new GlobalDataClass();
+        globalDataClass->InitGlobal();
+    }
+    return globalDataClass;
+}
 #pragma execution_character_set("utf-8")
 void GlobalDataClass::InitGlobal(){
     QDir dir(GlobalDataClass::Get()->PortraitPath());

@@ -27,22 +27,14 @@ WidRoom::WidRoom(QWidget *parent) :
     ui->widViews->setLayout(fl);
     ui->widViews->setStyleSheet("QWidget#widViews{background:#363B41;}");
 
-    connect(SRTCControl::Get(),SIGNAL(UpLevel(int)),this,SLOT(OnUpLevel(int)));
-    connect(SRTCControl::Get(),SIGNAL(DownLevel(QString,int)),this,SLOT(OnDownLevel(QString,int)));
-    connect(SRTCControl::Get(),SIGNAL(UpStat(QString)),this,SLOT(OnUpStat(QString)));
 
-    connect(SRTCControl::Get(),SIGNAL(DownStat(QString)),this,SLOT(OnDownStat(QString)));
-    connect(SRTCControl::Get(),SIGNAL(Speakers(QString)),this,SLOT(OnSpeakers(QString)));
-    connect(SRTCControl::Get(),SIGNAL(DevRrecovery(int)),this,SLOT(OnDevRrecovery(int)));
-    connect(SRTCControl::Get(),SIGNAL(DevChange(int,int,QString)),this,SLOT(OnDevChange(int,int,QString)));
-    connect(SRTCControl::Get(),SIGNAL(DefDevChange(int,int,QString)),this,SLOT(OnDefDevChange(int,int,QString)));
-
-    connect(SRTCControl::Get(),SIGNAL(MemberUserUpdate(QString)),this,SLOT(OnMemberUserUpdate(QString)));
-    connect(SRTCControl::Get(),SIGNAL(MemberUserLeave(QString)),this,SLOT(OnMemberUserLeave(QString)));
-    connect(SRTCControl::Get(),SIGNAL(RoomUpdate(QString)),this,SLOT(OnRoomUpdate(QString)));
-
-    connect(ui->scrollArea,SIGNAL(WheelChange()),this,SLOT(OnWheelChange()));
-
+    connect(SMeetControl::Get(), SIGNAL(UserEnter(QString, QString)), this, SLOT(OnUserEnter(QString, QString)));
+    connect(SMeetControl::Get(), SIGNAL(UserExit(QString, QString)), this, SLOT(OnMemberUserLeave(QString, QString)));
+    connect(SMeetControl::Get(), SIGNAL(smtCameraUpdate(int,int, QString)),this,SLOT(OnCameraUpdate(int, int, QString)));
+    connect(SMeetControl::Get(), SIGNAL(smtMicUpdate(int, int, QString)), this, SLOT(OnMicUpdate(int, int, QString)));
+    connect(SMeetControl::Get(), SIGNAL(smtNickNameUpdate(int, QString)), this, SLOT(OnNickNameUpdate(int, QString)));
+    connect(SMeetControl::Get(), SIGNAL(smtShareUpdate(int, int, QString)), this, SLOT(OnShareUpdate(int,int,QString)));
+    connect(SMeetControl::Get(), SIGNAL(smtExitRoomFinish(int,QString)), this, SLOT(OnExitRoomFinish(int, QString)));
     timetimer = new QTimer(this);
     connect(timetimer,&QTimer::timeout,[&]{
         int mt = begindt.msecsTo(QDateTime::currentDateTime());
@@ -54,12 +46,9 @@ WidRoom::WidRoom(QWidget *parent) :
 
 
 
-
     myView = nullptr;
-    reloadLeaveMap.clear();
-    SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED);
-    connect(SRTCControl::Get(),SIGNAL(JoinRoomFinish(QString,QString,QString,QString)),this,SLOT(OnJoinRoomFinish(QString,QString,QString,QString)));
     viewindex = 0;
+    init_view_finish = false;
 }
 
 WidRoom::~WidRoom()
@@ -74,49 +63,11 @@ void WidRoom::appendMsg(QString txt)
     //ui->txtmsg->append(txt);
 }
 
-void WidRoom::OnJoinRoomFinish(QString room,QString me,QString members,QString opts)
-{
-    needCloseRoom = false;
-    qDebug() << __func__ << room << members << opts;
-    RoomDataModel rm;
-    rm.Load(JsonUtil::GetJsonObjectFromString(room.toStdString()));
-    SRTCControl::Get()->sdkInfo.roomid = rm.room_id();
-
-    MemberDataModel lum;
-    lum.Load(JsonUtil::GetJsonObjectFromString(me.toStdString()));
-    SRTCControl::Get()->sdkInfo.userid = lum.uid();
-
-    QList<QString> oldmem = memberMap.keys();
-    QList<QString> newmem;
-
-    QJsonArray arr = JsonUtil::GetJsonArrayFromString(members.toStdString());
-    for (QJsonArray::iterator it = arr.begin(); it != arr.end(); ++it)
-    {
-        QJsonObject a = (*it).toObject();
-        MemberDataModel s;
-        s.Load(a);
-        if(s.uid() == SRTCControl::Get()->sdkInfo.userid){
-            continue;
-        }
-        MemberUpdate(s,false);
-        newmem.append(s.uid());
-    }
-
-    for(auto s : oldmem){
-        if(!newmem.contains(s)){
-            qDebug()<<__func__<<"re joinroom leave member:" + s;
-            reloadLeaveMap.append(s);
-        }
-    }
-
-
-    emit JoinFinish();
-}
 
 void WidRoom::InitData(bool cam,bool mic,bool speaker)
 {
-
-    qDebug() << __func__;
+    viewindex = 0;
+    qDebug() << __func__<<cam<<mic<<speaker;
     QTimer::singleShot(0,[&,cam,mic,speaker]{
         qDebug() <<"InitData" << __func__;
         ImageTipsWidgetWidget::DisplayDialog(this,tr("加入房间成功"));
@@ -125,42 +76,42 @@ void WidRoom::InitData(bool cam,bool mic,bool speaker)
             ui->btnCamera->setImgText(tr("开启视频"),":/Images/camc.png");
             ui->btnMic->setImgText(tr("解除静音"),":/Images/micc.png");
             ui->btnScreen->setImgText(tr("共享屏幕"),":/Images/bshare.png");
+            ui->btnMember->setImgText(tr("成员(1)"),"");
 
-            QString roomid = SRTCControl::Get()->sdkInfo.roomid;
+            QString roomid = SMeetControl::Get()->sdkInfo.roomid;
             roomid = QFontMetrics(ui->labTitle->font()).elidedText(roomid, Qt::ElideRight, 500);
 
             ui->labTitle->setText(roomid);
-            myView = CreateMemberView(SRTCControl::Get()->sdkInfo.userid,SRTCControl::Get()->sdkInfo.userName,SRTCControl::Get()->sdkInfo.userPortrait);
-            myView->SetToolName(SRTCControl::Get()->sdkInfo.userName+tr(" (我)"));
+            myView = CreateMemberView(SMeetControl::Get()->sdkInfo.userid,SMeetControl::Get()->sdkInfo.userName,SMeetControl::Get()->sdkInfo.userPortrait);
+            myView->SetToolName(SMeetControl::Get()->sdkInfo.userName+tr(" (我)"));
+            SMeetControl::Get()->SetCameraView(myView->GetShowViewWidget());
             begindt = QDateTime::currentDateTime();
             timetimer->start(1000);
             qDebug()<<"InitData"<<"OpenCloseCamera"<<cam;
-            OpenCloseCamera(cam);
+            if(cam)
+                OpenCloseCamera(cam);
             qDebug()<<"InitData"<<"OpenCloseMic"<<mic;
-            OpenCloseMic(mic);
+            if(mic)
+                OpenCloseMic(mic);
             qDebug()<<"InitData"<<"OpenCloseSpeaker"<<speaker;
-            OpenCloseSpeaker(speaker);
+            if(speaker)
+                OpenCloseSpeaker(speaker);
         }
 
+        init_view_finish = true;
         qDebug() << "InitData" << __func__ << 1;
-        //遍历减少的uid,进行删除
-        //添加view 没有的ui
-        for(auto l : reloadLeaveMap){
-            MemberLeave(l);
-        }
-        reloadLeaveMap.clear();
-
-        qDebug() << "InitData" << __func__ << 2;
-        auto it = memberMap.begin();
-        for(;it != memberMap.end() ; it++){
-            if(!it.value()->memview){
-                qDebug()<<"QTimer::singleShot(0,[&,cam,mic,speaker]{"<<it.key();
-                WidDiaplayView* l = CreateMemberView(it.key(),it.value()->data.name(),it.value()->data.avatar());
-                l->SetToolMic(it.value()->data.props().audioState());
-                l->SetToolCam(it.value()->data.props().videoState());
-                it.value()->memview = l;
+        for (auto& m : memberMap) {
+            if (!m->memview) {
+                MemberDataModel& mmd = m->data;
+                WidDiaplayView* l = CreateMemberView(mmd.uid(), mmd.name(), mmd.avatar());
+                l->SetToolMic(mmd.props().audioState());
+                l->SetToolCam(mmd.props().videoState());
+                m->memview = l;
             }
         }
+
+        qDebug() << "InitData" << __func__ << 2;
+
         qDebug() << "InitData" << __func__ << 3;
     });
 
@@ -186,7 +137,7 @@ void WidRoom::MemberLeave(QString id)
     }
 }
 
-bool WidRoom::MemberUpdate(MemberDataModel & mmd,bool updateview)
+bool WidRoom::MemberUpdate(MemberDataModel & mmd)
 {
     qDebug() << __func__;
     bool isadd = false;
@@ -202,10 +153,10 @@ bool WidRoom::MemberUpdate(MemberDataModel & mmd,bool updateview)
             if(v){
                 memberMap[mmd.uid()]->memview->SetToolCam(mmd.props().videoState());
                 if(!mmd.props().videoState()){
-                    memberMap[mmd.uid()]->memview->SetShowView(mmd.props().videoState());
+                    memberMap[mmd.uid()]->memview->SetToolCam(mmd.props().videoState());
                     int curTrack = memberMap[mmd.uid()]->memview->GetTrack();
                     if(curTrack != -1){
-                        SRTCControl::Get()->UnLoadRemoteVideoData(mmd.uid());
+                        SMeetControl::Get()->UnLoadRemoteVideoData(mmd.uid());
                         memberMap[mmd.uid()]->memview->SetTrack(-1);
                     }
                 }
@@ -222,10 +173,10 @@ bool WidRoom::MemberUpdate(MemberDataModel & mmd,bool updateview)
         isadd = false;
     }else
     {
-        qDebug()<<__func__<<"append member:"+mmd.uid()+",name:"+mmd.name()+"view:"+QString::number(updateview);
+        qDebug()<<__func__<<"append member:"+mmd.uid()+",name:"+mmd.name()+"view:"+QString::number(init_view_finish);
         MemberInfo* mem = new MemberInfo();
         mem->data = mmd;
-        if(updateview){
+        if(init_view_finish){
             WidDiaplayView* l = CreateMemberView(mmd.uid(),mmd.name(),mmd.avatar());
             l->SetToolMic(mmd.props().audioState());
             l->SetToolCam(mmd.props().videoState());
@@ -270,6 +221,7 @@ WidDiaplayView* WidRoom::CreateMemberView(QString id,QString name,QString portra
     v->SetToolCam(0);
     v->SetKey(id);
     v->SetToolPortrait(portrait);
+    v->SetToolNet(4);
     ui->widViews->layout()->addWidget(v);
     if(viewindex == 0){
         v->setFixedSize(ui->widViewBase->width(),ui->widViewBase->height());
@@ -293,119 +245,91 @@ WidDiaplayView* WidRoom::CreateMemberView(QString id,QString name,QString portra
 
 bool WidRoom::OpenCloseCamera(bool open,QString name)
 {
-    qDebug()<<__func__<<open;
-    QWidget* view = myView->GetShowViewWidget();
-    if(open)
-    {
-        int ret = SRTCControl::Get()->OpenCamera((void*)view->winId(),name);
-        if(!ret)
-        {
-            ui->btnCamera->setImgText(tr("关闭视频"),":/Images/cam.png");
-        }
-        else if(ret == (int)SRTC::StatusCode::Unauthorized){
-            GlobalDataClass::Get()->DisplayDialogLabel(this,tr("允许使用摄像头"),tr("请在“设置-隐私”下的“相机”中允许应用使用相机"),"",[&](QString s){
-                system("Explorer.EXE ms-settings:privacy-webcam");
-                return true;
-            },tr("前往设置"),tr("取消"));
-            return false;
-        }else
-        {
-            ImageTipsWidgetWidget::DisplayDialog(this,tr("摄像头打开异常%1,msg：%2").arg(ret).arg(SRTCControl::Get()->GetCodeMsg(ret)));
-            return false;
-        }
-    }else
-    {
-        SRTCControl::Get()->CloseCamera();
-        ui->btnCamera->setImgText(tr("开启视频"),":/Images/camc.png");
+    qDebug() << __func__ << open << name;
+    if(!name.isEmpty()){
+        SMeetControl::Get()->SwitchCamera(name);
     }
-    myView->SetToolCam(open);
-    myView->SetShowView(open);
-    vState = open;
-
+    if(open){
+        //OnCameraUpdate 成功或失败
+        SMeeting::StatusCode sc = SMeetControl::Get()->OpenCamera();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 打开摄像头异常：%1").arg((int)sc));
+        }
+    }else{
+        SMeeting::StatusCode sc = SMeetControl::Get()->CloseCamera();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 关闭摄像头异常：%1").arg((int)sc));
+        }
+    }
     qDebug() << __func__ << "finish";
     return true;
 }
 
 bool WidRoom::OpenCloseMic(bool open,QString name)
 {
-    qDebug()<<__func__<<open;
-    if(open)
-    {
-        int ret = SRTCControl::Get()->OpenMic(name);
-        if(!ret){
-            selectDefMic = name.isEmpty();
-            ui->btnMic->setImgText(tr("静音"),":/Images/mic.png");
-        }
-        else if(ret == (int)SRTC::StatusCode::Unauthorized){
-            GlobalDataClass::Get()->DisplayDialogLabel(this,tr("允许使用麦克风"),tr("请在“设置-隐私”下的“麦克风”中允许应用使用麦克风"),"",[&](QString s){
-                system("Explorer.EXE ms-settings:privacy-webcam");
-                return true;
-            },tr("前往设置"),tr("取消"));
-            return false;
-        }
-        else
-        {
-            ImageTipsWidgetWidget::DisplayDialog(this,tr("麦克风打开异常%1,msg：%2").arg(ret).arg(SRTCControl::Get()->GetCodeMsg(ret)));
-            return false;
-        }
-    }else
-    {
-        SRTCControl::Get()->CloseMic();
-        ui->btnMic->setImgText(tr("解除静音"),":/Images/micc.png");
+    qDebug() << __func__ << open << name;
+    if (!name.isEmpty()) {
+        SMeetControl::Get()->SwitchMic(name);
     }
-    myView->SetToolMic(open);
-    aState = open;
+    qDebug() << __func__;
+    if (open) {
+        //OnMicUpdate 成功或失败
+        SMeeting::StatusCode sc = SMeetControl::Get()->OpenMic();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 打开麦克风异常：%1").arg((int)sc));
+        }
+    }
+    else {
+        SMeeting::StatusCode sc = SMeetControl::Get()->CloseMic();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 关闭麦克风异常：%1").arg((int)sc));
+        }
+    }
 
     qDebug() << __func__ << "finish";
     return true;
 }
 bool WidRoom::OpenCloseSpeaker(bool open,QString name)
 {
-    qDebug()<<__func__<<open;
-    if(open)
-    {
-        int ret = SRTCControl::Get()->OpenSpeaker(name);
-        if(!ret){
-            selectDefSpeaker = name.isEmpty();
-        }
-        else
-        {
-            ImageTipsWidgetWidget::DisplayDialog(this,tr("扬声器打开异常%1，msg：%2").arg(ret).arg(SRTCControl::Get()->GetCodeMsg(ret)));
-            return false;
-        }
-    }else
-    {
-        SRTCControl::Get()->CloseSpeaker();
+    qDebug() << __func__ << open << name;
+    if (!name.isEmpty()) {
+        SMeetControl::Get()->SwitchSpeaker(name);
     }
-    speakerState = open;
-    qDebug() << __func__ << "finish";
+    SMeeting::StatusCode sc;
+    if (open) {
+        sc = SMeetControl::Get()->OpenSpeaker();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 打开扬声器异常：%1").arg((int)sc));
+        }
+    }
+    else {
+        sc = SMeetControl::Get()->CloseSpeaker();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 关闭扬声器异常：%1").arg((int)sc));
+        }
+    }
+    qDebug() << __func__ << "finish" << (int)sc;
     return true;
 }
 
 
 bool WidRoom::OpenCloseScreen(bool open,int hwnd,QRect rect)
 {
-    qDebug()<<__func__<<open<<rect;
-    if(open)
-    {
-        int ret = SRTCControl::Get()->OpenScreen(hwnd,rect);
-        if(!ret)
-            ui->btnScreen->setImgText(tr("结束共享"),":/Images/bsharestop.png");
-        else
-        {
-            ImageTipsWidgetWidget::DisplayDialog(this,tr("共享打开异常%1,msg：%2").arg(ret).arg(SRTCControl::Get()->GetCodeMsg(ret)));
-            return false;
+    qDebug() << __func__ << open << hwnd<<rect;
+    SMeeting::StatusCode sc;
+    if (open) {
+        sc = SMeetControl::Get()->OpenScreen(hwnd,rect);
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 打开共享异常：%1").arg((int)sc));
         }
-    }else
-    {
-        SRTCControl::Get()->CloseScreen();
-        ui->btnScreen->setImgText(tr("共享屏幕"),":/Images/bshare.png");
     }
-
-    SRTCControl::Get()->UpdateRoomShareProps(open);
-
-    sState = open;
-    qDebug() << __func__ << "finish";
+    else {
+        sc = SMeetControl::Get()->CloseScreen();
+        if (sc != SMeeting::StatusCode::OK) {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 关闭共享异常：%1").arg((int)sc));
+        }
+    }
+    qDebug() << __func__ << "finish" << (int)sc;
     return true;
 }
 
@@ -426,26 +350,6 @@ void WidRoom::OnDownStat(QString){
 }
 void WidRoom::OnSpeakers(QString speaker){
     return;
-    qDebug()<<__func__<<speaker;
-
-    QJsonDocument doc = QJsonDocument::fromJson(speaker.toLocal8Bit());
-    QJsonArray array = doc.array();
-    for (QJsonArray::iterator it = array.begin(); it != array.end(); ++it)
-    {
-        QJsonObject value = (*it).toObject();
-
-        QString userid = value.value("userid").toString();
-        if (userid == SRTCControl::Get()->sdkInfo.userid)
-        {
-            int db = value.value("db").toInt();
-            myView->UpdateAudioDB(db);
-            //底部
-        }else if (memberMap.find(userid) == memberMap.end())
-        {
-            int db = value.value("db").toInt();
-            memberMap[userid]->memview->UpdateAudioDB(db);
-        }
-    }
 }
 void WidRoom::OnDevRrecovery(int){
 
@@ -457,7 +361,7 @@ void WidRoom::OnDefDevChange(int tp,int act,QString name){
     qDebug()<<__func__<<act<<tp<<name;
     switch(tp){
         case 1:{
-            if(SRTCControl::Get()->IsOpenMic() && selectDefMic){
+            if(SMeetControl::Get()->IsOpenMic() && selectDefMic){
                 qDebug()<<__func__<<"re open mic";
                 OpenCloseMic(true);
             }
@@ -465,7 +369,7 @@ void WidRoom::OnDefDevChange(int tp,int act,QString name){
         break;
         case 2:
         {
-            if(SRTCControl::Get()->IsOpenSpeaker() && selectDefSpeaker){
+            if(SMeetControl::Get()->IsOpenSpeaker() && selectDefSpeaker){
                 qDebug()<<__func__<<"re open speaker";
                 OpenCloseSpeaker(true);
             }
@@ -475,13 +379,16 @@ void WidRoom::OnDefDevChange(int tp,int act,QString name){
 
     qDebug() << __func__ << "finish";
 }
-void WidRoom::OnMemberUserUpdate(QString user){
+void WidRoom::OnUserEnter(QString roomid,QString user){
+    return;
+
+
     qDebug() << __func__ << user;
     QJsonObject obj = JsonUtil::GetJsonObjectFromString(user.toStdString());
     MemberDataModel data;
     data.Load(obj);
-    qDebug()<<__func__<<data.uid()<<SRTCControl::Get()->sdkInfo.userid;//<<user;
-    if(data.uid() != SRTCControl::Get()->sdkInfo.userid){
+    qDebug()<<__func__<<data.uid()<<SMeetControl::Get()->sdkInfo.userid;//<<user;
+    if(data.uid() != SMeetControl::Get()->sdkInfo.userid){
         bool ret = MemberUpdate(data);
         if(ret){
             ImageTipsWidgetWidget::DisplayDialog(this,tr("成员加入房间，uid:%1 , 昵称：%2").arg(data.uid()).arg(data.name()));
@@ -489,13 +396,13 @@ void WidRoom::OnMemberUserUpdate(QString user){
     }
 }
 
-void WidRoom::OnMemberUserLeave(QString user)
+void WidRoom::OnMemberUserLeave(QString roomid, QString user)
 {
     qDebug() << __func__ << user;
     QJsonObject obj = JsonUtil::GetJsonObjectFromString(user.toStdString());
     MemberDataModel data;
     data.Load(obj);
-    qDebug()<<__func__<<data.uid()<<SRTCControl::Get()->sdkInfo.userid;
+    qDebug()<<__func__<<data.uid()<<SMeetControl::Get()->sdkInfo.userid;
     MemberLeave(data.uid());
     qDebug()<<__func__<<"cur member size:"<<(memberMap.size()+1);
     ImageTipsWidgetWidget::DisplayDialog(this,tr("成员离开房间，uid:%1 , 昵称：%2").arg(data.uid()).arg(data.name()));
@@ -525,8 +432,8 @@ void WidRoom::OnRoomUpdate(QString room)
     else {
         ss_msg = tr("未知共享状态");
     }
-    if(rm.props().uid() == SRTCControl::Get()->sdkInfo.userid){
-        QString name = SRTCControl::Get()->sdkInfo.userName;
+    if(rm.props().uid() == SMeetControl::Get()->sdkInfo.userid){
+        QString name = SMeetControl::Get()->sdkInfo.userName;
 
         ImageTipsWidgetWidget::DisplayDialog(this,name + ss_msg);
     }
@@ -535,8 +442,8 @@ void WidRoom::OnRoomUpdate(QString room)
         QString name = memberMap[rm.props().uid()]->data.name();
         ImageTipsWidgetWidget::DisplayDialog(this,name + ss_msg);
          if(memberMap[rm.props().uid()]->memview->GetTrack() == 2){
-             SRTCControl::Get()->UnLoadRemoteVideoData(rm.props().uid());
-             memberMap[rm.props().uid()]->memview->SetShowView(false);
+             SMeetControl::Get()->UnLoadRemoteVideoData(rm.props().uid());
+             memberMap[rm.props().uid()]->memview->SetToolCam(false);
              memberMap[rm.props().uid()]->memview->SetTrack(-1);
          }
     }
@@ -560,74 +467,7 @@ void WidRoom::on_btnMic_clicked()
 {
     qDebug() << __func__;
     int v = !aState;
-    if(v){
-        DeviceList vdl;
-        SRTCControl::Get()->EnumMicDev(vdl);
-        QList<QString> ls;
-        qDebug()<<vdl.GetDeviceSize();
-        if(vdl.GetDeviceSize()){
-            ls.append(VIEW_DEFAULT_DEV);
-        }
-        for(int i = 0;i<vdl.GetDeviceSize();i++){
-            ls.append(vdl.GetDevice(i).GetName());
-        }
-        if(ls.isEmpty()){
-            ls.append(tr("空"));
-        }
-        QString arg = ls.join(",");
-        GlobalDataClass::Get()->DisplayDialogRadio(this,tr("选择麦克风设备"),arg,selectDefMicName,[&,v](QString s){
-            qDebug()<<__func__<<"select mic dev :"<<s;
-            selectDefMicName = s;
-            if(s != tr("空")){
-                if(s == VIEW_DEFAULT_DEV){
-                    s = "";
-                }
-                OpenCloseMic(v,s);
-            }
-            return true;
-        });
-    }else{
-        OpenCloseMic(v);
-    }
-
-    qDebug() << __func__ << "finish";
-}
-
-
-void WidRoom::on_btnSpeaker_clicked()
-{
-    qDebug() << __func__;
-    int v = !speakerState;
-    if(v){
-        DeviceList vdl;
-        SRTCControl::Get()->EnumSpeakerDev(vdl);
-        QList<QString> ls;
-        qDebug()<<vdl.GetDeviceSize();
-        if(vdl.GetDeviceSize()){
-            ls.append(VIEW_DEFAULT_DEV);
-        }
-        for(int i =0;i<vdl.GetDeviceSize();i++){
-            ls.append(vdl.GetDevice(i).GetName());
-        }
-        if(ls.isEmpty()){
-            ls.append(tr("空"));
-        }
-        QString arg = ls.join(",");
-        GlobalDataClass::Get()->DisplayDialogRadio(this,tr("选择扬声器设备"),arg,selectDefSpeakerName,[&,v](QString s){
-            qDebug()<<__func__<<"select speaker dev :"<<s;
-            selectDefSpeakerName = s;
-            if(s != tr("空")){
-                if(s == VIEW_DEFAULT_DEV){
-                    s = "";
-                }
-                OpenCloseSpeaker(v,s);
-            }
-            return true;
-        });
-    }else{
-        OpenCloseSpeaker(v);
-    }
-
+    OpenCloseMic(v);
     qDebug() << __func__ << "finish";
 }
 
@@ -635,31 +475,7 @@ void WidRoom::on_btnCamera_clicked()
 {
     qDebug() << __func__;
     int v = !vState;
-    if(v){
-        VideoDeviceList vdl;
-        SRTCControl::Get()->EnumCameraDev(vdl);
-        QList<QString> ls;
-        qDebug()<<vdl.GetDeviceSize();
-        for(int i =0;i<vdl.GetDeviceSize();i++){
-            ls.append(vdl.GetDevice(i).GetName());
-        }
-        if(ls.isEmpty()){
-            ls.append(tr("空"));
-        }
-        QString arg = ls.join(",");
-
-        GlobalDataClass::Get()->DisplayDialogRadio(this,tr("选择摄像头设备"),arg,selectDefCameraName,[&,v](QString s){
-            qDebug()<<__func__<<"select camera dev :"<<s;
-            selectDefCameraName = s;
-            if(s != tr("空")){
-                OpenCloseCamera(v,s);
-            }
-            return true;
-        });
-    }else{
-        OpenCloseCamera(v);
-    }
-
+    OpenCloseCamera(v);
     qDebug() << __func__ << "finish";
 }
 
@@ -681,7 +497,7 @@ void WidRoom::CloseRoom(bool v)
     viewindex = 0;
     GlobalDataClass::Get()->DisplayDialogClose();
     ChatControl::Get()->CloseDialog();
-    if (SRTCControl::Get()->IsOpenScreen()) {
+    if (SMeetControl::Get()->IsOpenScreen()) {
         OpenCloseScreen(false);
     }
 
@@ -704,11 +520,8 @@ void WidRoom::CloseRoom(bool v)
     timetimer->stop();
     ChatControl::Get()->ClearMsgView();
     qDebug()<<__func__<<"close chat data";
-    SRTCControl::Get()->CloseRoom();
+    SMeetControl::Get()->CloseRoom();
     qDebug()<<__func__<<"close room";
-    if(v){
-        emit ExitRoom();
-    }
     qDebug()<<__func__<<"close room finish";
 }
 
@@ -718,7 +531,7 @@ void WidRoom::OnMemberClicked()
     WidDiaplayView* btn = qobject_cast<WidDiaplayView*>(sender());
     qDebug()<<__func__<<btn->GetKey();
     QString key = btn->GetKey();
-    if(key == SRTCControl::Get()->sdkInfo.userid){
+    if(key == SMeetControl::Get()->sdkInfo.userid){
 
     }else{
         chkmember = key;
@@ -778,13 +591,13 @@ void WidRoom::OnMemberClicked()
             WidDiaplayView* view = memberMap[key]->memview;
             if(tk == -1){
                 view->SetTrack(-1);
-                view->SetShowView(false);
-                SRTCControl::Get()->UnLoadRemoteVideoData(key);
+                view->SetToolCam(false);
+                SMeetControl::Get()->UnLoadRemoteVideoData(key);
             }else{
                 qDebug()<<__func__<<key<<tk;
                 view->SetTrack(tk);
-                view->SetShowView(true);
-                SRTCControl::Get()->LoadRemoteVideoData(key,tk,(void*)view->GetShowViewWidget()->winId());
+                view->SetToolCam(true);
+                SMeetControl::Get()->LoadRemoteVideoData(key,tk,view->GetShowViewWidget());
             }
             return true;
         });
@@ -796,16 +609,14 @@ void WidRoom::OnNameClicked()
 {
     qDebug() << __func__;
     QString out;
-    QString arg = SRTCControl::Get()->sdkInfo.userName;
+    QString arg = SMeetControl::Get()->sdkInfo.userName;
     GlobalDataClass::Get()->DisplayDialogLed(this,tr("修改昵称"),arg,tr("请输入昵称"),[&](QString out){
         
         out = out.trimmed();
         if(out.isEmpty()){
             return false;
         }
-        SRTCControl::Get()->UpdateNickName(out);
-        myView->SetToolName(out + tr(" (我)"));
-        ChatControl::Get()->UpdateNickName(SRTCControl::Get()->sdkInfo.userid,out);
+        SMeetControl::Get()->UpdateNickName(out);
         return true;
     });
 
@@ -820,7 +631,7 @@ void WidRoom::on_labTitle_clicked()
         widSetData = new WidSetData();
         connect(widSetData,SIGNAL(NameClicked()),this,SLOT(OnNameClicked()));
     }
-    SdkInfo si = SRTCControl::Get()->sdkInfo;
+    SdkInfo si = SMeetControl::Get()->sdkInfo;
     widSetData->SetUIData(si.userid,si.userName,si.userPortrait);
     widSetData->exec();
 }
@@ -832,15 +643,12 @@ void WidRoom::reflashAllView()
         if(m->memview){
              int ret = m->memview->GetTrack();
              if(ret >= 0){
-                 SRTCControl::Get()->ReflashView(m->data.uid());
+                 SMeetControl::Get()->ReflashView(m->data.uid());
              }
         }
     }
 }
-void WidRoom::OnWheelChange()
-{
-    reflashAllView(); 
-}
+
 #include "WidDeviceList.h"
 void WidRoom::on_btnMicMore_clicked()
 {
@@ -866,11 +674,95 @@ void WidRoom::on_btnCameraMore_clicked()
         w->move(p);
     }
 }
-
-void WidRoom::on_btnTest_clicked()
+void WidRoom::on_pushButton_clicked()
 {
+    //((GdiRenderView*)myView->GetShowViewWidget())->updateFull(255,0,0);
 
-//    freopen("out.txt", "wb+", stdout);
-//    SRTCControl::Get()->ReOpenSpeaker();
 }
 
+
+void WidRoom::OnCameraUpdate(int open,int code,QString data)
+{
+    qDebug() << __func__ << open << code << data;
+    if (!code) {
+        vState = open;
+        myView->SetToolCam(open);
+        if (open) {
+            ui->btnCamera->setImgText(tr("关闭视频"), ":/Images/cam.png");
+        }
+        else {
+            ui->btnCamera->setImgText(tr("开启视频"), ":/Images/camc.png");
+        }
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK %1摄像头异常2：%2,%3")
+            .arg(open? tr("打开"): tr("关闭")).arg((int)code).arg(data));
+    }
+}
+
+void WidRoom::OnMicUpdate(int open, int code , QString data)
+{
+    qDebug() << __func__ << open << code << data;
+    if (!code) {
+        aState = open;
+        myView->SetToolMic(open);
+        if (open) {
+            ui->btnMic->setImgText(tr("关闭麦克风"), ":/Images/mic.png");
+        }
+        else {
+            ui->btnMic->setImgText(tr("麦克风"), ":/Images/micc.png");
+        }
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK %1麦克风异常2：%2,%3")
+            .arg(open ? tr("打开") : tr("关闭")).arg((int)code).arg(data));
+    }
+}
+
+void WidRoom::OnNickNameUpdate(int code, QString data)
+{
+    if (!code) {
+        myView->SetToolName(data + tr(" (我)"));
+        ChatControl::Get()->UpdateNickName(SMeetControl::Get()->sdkInfo.userid, data);
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 修改昵称异常：%1,%2")
+            .arg((int)code).arg(data));
+    }
+}
+
+void WidRoom::OnShareUpdate(int tp, int code, QString data)
+{
+    if (!code) {
+        if (tp == 1)
+        {
+            sState = true;
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("开始共享"));
+            ui->btnScreen->setImgText(tr("解除共享"), ":/Images/bsharestop.png");
+        }
+        else if(tp == 0){
+            sState = false;
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("结束共享"));
+            ui->btnScreen->setImgText(tr("共享屏幕"), ":/Images/bshare.png");
+        }
+        else {
+            ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("not deal code:%1").arg(__func__));
+        }
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 退出会议异常：%1,%2")
+            .arg((int)code).arg(data));
+    }
+}
+
+void WidRoom::OnExitRoomFinish(int code, QString data)
+{
+    if (!code) {
+        init_view_finish = false;
+        emit ExitRoom();
+    }
+    else {
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, tr("SDK 退出会议异常：%1,%2")
+                    .arg((int)code).arg(data));
+    }
+}

@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    srand(time(0));
 #if true
     if (QFile::exists(QCoreApplication::applicationDirPath() + "/log4qt.conf"))
     {

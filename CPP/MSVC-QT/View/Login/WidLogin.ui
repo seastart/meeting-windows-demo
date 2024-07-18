@@ -428,7 +428,7 @@ QRadioButton:checked{
               <string notr="true"/>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="stackedWidgetPage1">
               <property name="styleSheet">
@@ -889,7 +889,7 @@ color:#0039B3;</string>
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
              <property name="spacing">
               <number>0</number>
              </property>
@@ -898,8 +898,11 @@ color:#0039B3;</string>
              </property>
              <item>
               <widget class="QLineEdit" name="ledHost">
+               <property name="styleSheet">
+                <string notr="true">padding:0px;</string>
+               </property>
                <property name="text">
-                <string>http://localv2.srtc.live:8087</string>
+                <string>http://localv2.srtc.live:8089</string>
                </property>
                <property name="placeholderText">
                 <string>服务器地址</string>
@@ -907,20 +910,17 @@ color:#0039B3;</string>
               </widget>
              </item>
              <item>
-              <spacer name="verticalSpacer_11">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
+              <widget class="QLineEdit" name="ledRtcHost">
+               <property name="styleSheet">
+                <string notr="true">padding:0px;</string>
                </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+               <property name="text">
+                <string>https://localv2.srtc.live:9000</string>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>20</height>
-                </size>
+               <property name="placeholderText">
+                <string>rtc服务器地址</string>
                </property>
-              </spacer>
+              </widget>
              </item>
             </layout>
            </item>

@@ -140,3 +140,14 @@ float Utils::GetMemoryUse()
     int memoryUsage_M = pmc.WorkingSetSize / 1024 / 1024;
     return memoryUsage_M;//memoryUsage_M * 100.0 / sysMemory_M;
 }
+
+QString Utils::GetRandData(int len)
+{
+    QString data = "123456789ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz";
+    QString Rand = "";
+    for (int i = 0; i < len; i++)
+    {
+        Rand += data.at(rand() % data.size());
+    }
+    return Rand;
+}

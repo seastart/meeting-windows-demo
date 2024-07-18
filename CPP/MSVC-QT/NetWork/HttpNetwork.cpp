@@ -24,11 +24,20 @@ void HttpNetwork::SetHost(QString inHost)
 {
 	host = inHost;
 }
-
+	
 // 获取地址
 QString HttpNetwork::Host()
 {
 	return host;
+}
+
+void HttpNetwork::SetToken(QString tk)
+{
+	token = tk;
+}
+QString HttpNetwork::Token()
+{
+	return token;
 }
 
 void HttpNetwork::OnDownload(const char* url, std::function<void(QByteArray& byte)> function)
@@ -49,6 +58,31 @@ void HttpNetwork::OnDownload(const char* url, std::function<void(QByteArray& byt
 	HttpNetwork::Get()->network->get(request);
 }
 
+void HttpNetwork::OnGet(
+	const char* url,
+	std::function<void(QByteArray& byte)> function)
+{
+	QString requestUrl;
+
+
+	requestUrl = Get()->Host() + url;
+	qDebug() << __func__ << "on post url:" << requestUrl;
+	if (HttpNetwork::Get()->callMap.contains(requestUrl))
+	{
+		QString jsonNetError = tr("{\"code\":1714,\"msg\":\"操作被取消\"}");
+		QByteArray byte = jsonNetError.toStdString().c_str();
+		HttpNetwork::Get()->callMap[requestUrl](byte);
+		//return;
+	}
+
+	QNetworkRequest request = Get()->CreateRequest(requestUrl);
+	request.setPriority(QNetworkRequest::Priority::HighPriority);
+
+	// 保存回调函数
+	HttpNetwork::Get()->callMap[request.url().toString()] = function;
+	// 发送请求s
+	QNetworkReply* reply = HttpNetwork::Get()->network->get(request);
+}
 void HttpNetwork::OnPost(
 	const char* url,
 	QByteArray post_data,
@@ -58,7 +92,7 @@ void HttpNetwork::OnPost(
 
 
 	requestUrl = Get()->Host() + url;
-	qDebug()<<__func__<<"on post url:" << requestUrl;
+    qDebug()<<__func__<<"on post url:" << requestUrl<<"data:"<<post_data;
 	if (HttpNetwork::Get()->callMap.contains(requestUrl))
 	{
 		QString jsonNetError = tr("{\"code\":1714,\"msg\":\"操作被取消\"}");
@@ -72,7 +106,7 @@ void HttpNetwork::OnPost(
 
 	// 保存回调函数
 	HttpNetwork::Get()->callMap[request.url().toString()] = function;
-	// 发送请求
+    // 发送请求s
 	QNetworkReply* reply = HttpNetwork::Get()->network->post(request, post_data);
 }
 
@@ -96,8 +130,11 @@ QNetworkRequest HttpNetwork::CreateRequest(QString urlString)
 	request.setSslConfiguration(config);
 
 
+	if (!token.isEmpty()) {
+		request.setRawHeader("Authorization", ("Bearer " + token).toLocal8Bit());
+	}
+    
     request.setRawHeader("Content-Type", "application/json");
-
 
 	return request;
 }
@@ -113,7 +150,7 @@ void HttpNetwork::OnRequestComplete(QNetworkReply* reply)
 
 
 	QByteArray byte = reply->readAll();
-	qDebug()<<("url:" + key + "requestComplete:" + byte);
+    qDebug()<<("url:" + key + "  ,requestComplete:" + byte);
 	if (byte.isEmpty())
 	{
 		QString jsonNetError = tr("{\"code\":1713,\"msg\":\"没有连接上网络\"}");

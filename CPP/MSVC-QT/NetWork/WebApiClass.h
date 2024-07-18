@@ -14,9 +14,12 @@ public:
 	~WebApiClass() {};
 public:
 
-	static void ServerUser_AuthGrant(QString name , std::function<void(QByteArray& byte)> function = nullptr);
+	static void AuthLogin_Account(QString name , QString pass , std::function<void(QByteArray& byte)> function = nullptr);
 
-	static void AccountRegister(QString name, QString password, QString nickname, QString mobile, QString avatar, std::function<void(QByteArray& byte)> function = nullptr);
+	static void AuthRegister(QString mobile, QString password,  QString captcha, std::function<void(QByteArray& byte)> function = nullptr);
 
-	
+	static void AuthSms_Code(QString mobile, std::function<void(QByteArray& byte)> function = nullptr);
+
+
+	static void Meeting_Grant(std::function<void(QByteArray& byte)> function = nullptr);
 };

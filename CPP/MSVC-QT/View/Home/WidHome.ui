@@ -386,7 +386,7 @@ color:#333;</string>
               </spacer>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit">
+              <widget class="QLineEdit" name="ledRoomNo">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -438,7 +438,7 @@ color:#333;</string>
               </spacer>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_2">
+              <widget class="QLineEdit" name="ledRoomName">
                <property name="placeholderText">
                 <string>请输入用户昵称</string>
                </property>

@@ -76,9 +76,15 @@ void WidRegister::initData()
         btn->move(ui.ledPass->width() - 32, (40 - 16) / 2 + 2);
         });
 }
+#include "../Common/ImageTipsWidgetWidget.h"
 
 void WidRegister::on_btnCode_clicked()
 {
+    WebApiClass::AuthSms_Code(ui.ledName->text(), [&](QByteArray& byte) {
+        qDebug() << __func__ << byte;
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, byte);
+        });
+
     codeCount = 60;
     codeTimer->start(1000);
     ui.btnCode->setEnabled(false);
@@ -97,11 +103,13 @@ void WidRegister::OnCodeTimer()
         ui.btnCode->setText(tr("·¢ËÍÑéÖ¤Âë"));
     }
 }
-
 void WidRegister::on_btnRegister_clicked()
 {
-
-	emit RegisterFinish();
+    WebApiClass::AuthRegister(ui.ledName->text(), ui.ledPass->text(), ui.ledCode->text(), [&] (QByteArray& byte){
+        qDebug() << __func__ << byte;
+        ImageTipsWidgetWidget::DisplayDialog(nullptr, byte);
+        });
+	//emit RegisterFinish();
 }
 void WidRegister::on_btnBack_clicked()
 {

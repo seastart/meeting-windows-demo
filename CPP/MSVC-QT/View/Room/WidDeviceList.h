@@ -1,10 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include <QWidget>
 #include "ui_WidDeviceList.h"
 #include "View/Common/TanChuWid.h"
-#include "RtcSdk/VideoDevice.h"
-#include "RtcSdk/SRTCControl.h"
+#include "SMeetingSdk/VideoDevice.h"
+#include "SMeetingSdk/SMeetControl.h"
 class WidDeviceList : public TanChuWid
 {
 	Q_OBJECT

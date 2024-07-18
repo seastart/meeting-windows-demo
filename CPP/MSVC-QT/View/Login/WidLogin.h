@@ -29,6 +29,10 @@ private slots:
 
     void on_btnCode_clicked();
     void OnCodeTimer();
+    void OnLoginFinish(int v);
+
+    void on_pushbuttom_2_clicked();
+    void on_pushbuttom_3_clicked();
 signals:
     void LoginFinish();
     void Register();

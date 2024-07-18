@@ -23,8 +23,11 @@
     <ClInclude Include="DataModel\MemberDataModel.h" />
     <ClInclude Include="DataModel\RoomDataModel.h" />
     <QtMoc Include="NetWork\WebApiClass.h" />
-    <ClInclude Include="RtcSdk\VideoDevice.h" />
+    <QtMoc Include="SMeetingSdk\SMeetControl.h" />
+    <QtMoc Include="SMeetingSdk\QtRenderView.h" />
+    <ClInclude Include="SMeetingSdk\VideoDevice.h" />
     <ClInclude Include="Tools\FlowLayout.h" />
+    <QtMoc Include="Tools\LoadingWidget.h" />
     <ClInclude Include="Tools\log4qt\basicconfigurator.h" />
     <ClInclude Include="Tools\log4qt\helpers\classlogger.h" />
     <ClInclude Include="Tools\log4qt\helpers\datetime.h" />
@@ -90,7 +93,6 @@
     <ClInclude Include="Tools\Utils.h" />
     <QtMoc Include="Tools\SetImageClass.h" />
     <QtMoc Include="Tools\MyScrollArea.h" />
-    <QtMoc Include="RtcSdk\SRTCControl.h" />
     <QtMoc Include="NetWork\HttpNetwork.h" />
     <QtMoc Include="Global\GlobalDataClass.h" />
   </ItemGroup>
@@ -99,9 +101,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetWork\HttpNetwork.cpp" />
     <ClCompile Include="NetWork\WebApiClass.cpp" />
-    <ClCompile Include="RtcSdk\SRTCControl.cpp" />
-    <ClCompile Include="RtcSdk\VideoDevice.cpp" />
+    <ClCompile Include="SMeetingSdk\QtRenderView.cpp" />
+    <ClCompile Include="SMeetingSdk\SMeetControl.cpp" />
+    <ClCompile Include="SMeetingSdk\VideoDevice.cpp" />
     <ClCompile Include="Tools\FlowLayout.cpp" />
+    <ClCompile Include="Tools\LoadingWidget.cpp" />
     <ClCompile Include="Tools\log4qt\appenderskeleton.cpp" />
     <ClCompile Include="Tools\log4qt\basicconfigurator.cpp" />
     <ClCompile Include="Tools\log4qt\consoleappender.cpp" />
@@ -201,6 +205,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
@@ -233,13 +238,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'">
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)Tools;$(SolutionDir)RtcSdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)RtcSdk\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Tools;$(SolutionDir)SMeetingSdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)SMeetingSdk\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\out</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
-      <AdditionalDependencies>RTCEngine.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SMeeting.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">

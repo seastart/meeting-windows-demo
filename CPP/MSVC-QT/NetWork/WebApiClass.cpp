@@ -6,25 +6,42 @@
 
 #pragma execution_character_set("utf-8")
 
-void WebApiClass::ServerUser_AuthGrant(QString name, std::function<void(QByteArray& byte)> function = nullptr)
+void WebApiClass::AuthLogin_Account(QString account,QString password, std::function<void(QByteArray& byte)> function)
 {
 	QJsonDocument doc;
 	QJsonObject obj;
-	obj["user_id"] = name;
+	obj["account"] = account;
+	obj["password"] = password;
 	doc.setObject(obj);
-	HttpNetwork::OnPost("/server/user-auth/grant", doc.toJson(QJsonDocument::Compact), function);
+	HttpNetwork::OnPost("/api/v1/auth/login-account", doc.toJson(QJsonDocument::Compact), function);
 }
 
-void WebApiClass::AccountRegister(QString name, QString password, QString nickname, QString mobile, QString avatar, std::function<void(QByteArray& byte)> function)
+void WebApiClass::AuthRegister(QString mobile, QString password, QString captcha, std::function<void(QByteArray& byte)> function)
 {
 	QJsonDocument doc;
 	QJsonObject obj;
-	obj["user_name"] = name;
 	obj["password"] = password;
-	obj["nick_name"] = nickname;
-	obj["avatar"] = avatar;
+	obj["captcha"] = captcha;
 	obj["mobile"] = mobile;
 	doc.setObject(obj);
 
-	HttpNetwork::OnPost("account/register", doc.toJson(QJsonDocument::Compact) , function);
+	HttpNetwork::OnPost("/api/v1/auth/register", doc.toJson(QJsonDocument::Compact) , function);
+}
+
+void WebApiClass::AuthSms_Code(QString mobile, std::function<void(QByteArray& byte)> function)
+{
+
+	QJsonDocument doc;
+	QJsonObject obj;
+	obj["scene"] = "register";
+	obj["mobile"] = mobile;
+	doc.setObject(obj);
+
+	HttpNetwork::OnPost("/api/v1/auth/sms-code", doc.toJson(QJsonDocument::Compact), function);
+}
+
+
+void WebApiClass::Meeting_Grant(std::function<void(QByteArray& byte)> function)
+{
+	HttpNetwork::OnGet("/api/v1/meeting/grant", function);
 }
